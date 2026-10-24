@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Food Donation System - Feed Hope, Reduce Waste</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Design System Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+<!-- Include Reusable Glassmorphism Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="flex-grow-1">
+    <div class="container py-4 py-lg-5">
+
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="custom-alert custom-alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="custom-alert custom-alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Hero Section with Glassmorphism and Animated Badges -->
+        <div class="hero-wrapper p-4 p-md-5 mb-5">
+            <div class="row align-items-center position-relative" style="z-index: 1;">
+                <div class="col-lg-8">
+                    <div class="d-inline-flex align-items-center gap-2 hero-pill mb-3">
+                        <span class="pulse-dot text-emerald"></span>
+                        <span>Zero-Waste Smart Community</span>
+                    </div>
+                    <h1 class="display-5 fw-extrabold text-white mb-3">
+                        Bridging Surplus Food to <span class="text-warning">Hungry Hearts</span>
+                    </h1>
+                    <p class="lead text-white-50 mb-4 pe-lg-5">
+                        A real-time intelligent platform connecting restaurants, caterers, and food donors directly with verified NGOs to eliminate food waste and fight hunger.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a th:if="${session.loggedInUser == null or session.userRole == 'DONOR'}" href="/donate" class="btn-primary-custom text-decoration-none">
+                            <i class="bi bi-plus-circle-fill"></i>
+                            <span>Donate Surplus Food</span>
+                        </a>
+                        <a th:if="${session.loggedInUser == null}" href="/register" class="btn btn-outline-light rounded-pill px-4 py-2 fw-semibold">
+                            <i class="bi bi-building-check me-1"></i> Register as NGO
+                        </a>
+                        <a th:if="${session.loggedInUser != null and session.userRole == 'NGO'}" href="/ngo/dashboard" class="btn btn-outline-light rounded-pill px-4 py-2 fw-semibold">
+                            <i class="bi bi-box-seam me-1"></i> My Claimed Pickups
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mt-4 mt-lg-0 text-center">
+                    <div class="bg-white bg-opacity-10 backdrop-blur border border-white border-opacity-20 rounded-4 p-4 text-start text-white shadow-lg">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-activity text-emerald fs-4"></i>
+                            <span class="fw-bold fs-6">Live Network Pulse</span>
+                        </div>
+                        <div class="row g-2 text-center">
+                            <div class="col-6">
+                                <div class="bg-black bg-opacity-25 rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-emerald" th:text="${stats.availableCount}">0</div>
+                                    <div class="small text-white-50">Active Posts</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-black bg-opacity-25 rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-info" th:text="${stats.claimedCount}">0</div>
+                                    <div class="small text-white-50">In Pickup</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-black bg-opacity-25 rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-warning" th:text="${stats.completedCount}">0</div>
+                                    <div class="small text-white-50">Rescued</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-black bg-opacity-25 rounded-3 p-3">
+                                    <div class="fs-3 fw-bold text-success" th:text="${stats.totalMealsSaved}">0</div>
+                                    <div class="small text-white-50">Meals Served</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="card border-0 shadow-sm rounded-4 p-3 p-md-4 mb-4 bg-white">
+            <form method="get" action="/" class="row g-3 align-items-center">
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0 text-muted ps-3">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="query" th:value="${searchQuery}" class="form-control bg-light border-0 py-2 fs-6" placeholder="Search by food name, pickup location, or donor...">
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-4">
+                    <select name="foodType" class="form-select bg-light border-0 py-2 fs-6" onchange="this.form.submit()">
+                        <option value="ALL" th:selected="${selectedFoodType == 'ALL'}">🍽️ All Food Categories</option>
+                        <option value="Vegetarian" th:selected="${selectedFoodType == 'Vegetarian'}">🌱 Vegetarian Food</option>
+                        <option value="Non-Vegetarian" th:selected="${selectedFoodType == 'Non-Vegetarian'}">🍗 Non-Vegetarian Food</option>
+                        <option value="Vegan" th:selected="${selectedFoodType == 'Vegan'}">🥗 Vegan Only</option>
+                        <option value="Packaged / Dry Food" th:selected="${selectedFoodType == 'Packaged / Dry Food'}">📦 Packaged & Dry Food</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 col-lg-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-semibold">
+                        Filter
+                    </button>
+                    <a href="/" class="btn btn-light rounded-pill py-2 px-3 text-muted" title="Reset Filters">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Available Food Directory -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">
+                    Live Available Food Listings
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill fs-6 ms-2" th:text="${#lists.size(listings)} + ' Available'">0 Available</span>
+                </h3>
+                <p class="text-muted small mb-0">Surplus meals ready for rapid pickup by certified charitable partners.</p>
+            </div>
+            <div th:if="${session.loggedInUser == null}">
+                <a href="/login" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-semibold">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Sign in to Claim
+                </a>
+            </div>
+        </div>
+
+        <!-- Food Listings Grid -->
+        <div class="row g-4 mb-5" th:if="${not #lists.isEmpty(listings)}">
+            <div class="col-md-6 col-lg-4" th:each="item : ${listings}">
+                <div class="food-card">
+                    <div class="food-card-header d-flex justify-content-between align-items-start">
+                        <span th:if="${item.foodType == 'Vegetarian'}" class="type-pill veg">🌱 Vegetarian</span>
+                        <span th:if="${item.foodType == 'Non-Vegetarian'}" class="type-pill nonveg">🍗 Non-Veg</span>
+                        <span th:if="${item.foodType == 'Vegan'}" class="type-pill veg">🥗 Vegan</span>
+                        <span th:if="${item.foodType == 'Packaged / Dry Food'}" class="type-pill">📦 Packaged</span>
+                        <span th:if="${item.foodType == null or (item.foodType != 'Vegetarian' and item.foodType != 'Non-Vegetarian' and item.foodType != 'Vegan' and item.foodType != 'Packaged / Dry Food')}" class="type-pill">🍲 General</span>
+
+                        <span class="status-pill available">
+                            <span class="pulse-dot"></span>
+                            <span>Available</span>
+                        </span>
+                    </div>
+
+                    <div class="food-card-body">
+                        <h5 class="fw-bold text-dark mb-2" th:text="${item.title}">Food Title</h5>
+                        <p class="text-muted small mb-3" th:if="${item.description != null and !item.description.isEmpty()}" th:text="${item.description}">
+                            Description notes...
+                        </p>
+
+                        <div class="bg-light rounded-3 p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small"><i class="bi bi-box2 me-1 text-emerald"></i> Quantity:</span>
+                                <span class="fw-bold text-dark fs-6" th:text="${item.quantity} + ' ' + ${item.unit != null ? item.unit : 'Meals'}">25 Meals</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small"><i class="bi bi-geo-alt me-1 text-danger"></i> Location:</span>
+                                <span class="fw-semibold text-dark text-truncate small" style="max-width: 180px;" th:text="${item.location}">City Center</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted small"><i class="bi bi-hourglass-split me-1 text-warning"></i> Best Before:</span>
+                                <span class="fw-semibold text-danger small" th:text="${#temporals.format(item.expiryTime, 'dd MMM, hh:mm a')}">Expiry Time</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 pt-1 border-top border-light">
+                            <div class="brand-badge" style="width: 28px; height: 28px; font-size: 0.8rem;">👨‍🍳</div>
+                            <div class="small">
+                                <span class="text-muted">Posted by: </span>
+                                <span class="fw-semibold text-dark" th:text="${item.donor.name}">Donor Name</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="food-card-footer">
+                        <!-- If NGO: Trigger Clean Global Claim Modal -->
+                        <div th:if="${session.loggedInUser != null and session.userRole == 'NGO'}">
+                            <button type="button" class="btn btn-success w-100 rounded-pill fw-semibold shadow-sm claim-btn"
+                                    th:data-id="${item.id}"
+                                    th:data-title="${item.title}"
+                                    th:data-quantity="${item.quantity} + ' ' + ${item.unit != null ? item.unit : 'Meals'}"
+                                    th:data-location="${item.location}">
+                                <i class="bi bi-hand-index-thumb-fill me-1"></i> Claim for Distribution
+                            </button>
+                        </div>
+
+                        <!-- If Guest: Prompt Login -->
+                        <div th:if="${session.loggedInUser == null}">
+                            <a href="/login" class="btn btn-outline-success w-100 rounded-pill fw-semibold">
+                                <i class="bi bi-lock-fill me-1"></i> NGO Login to Claim
+                            </a>
+                        </div>
+
+                        <!-- If Donor: Informational pill -->
+                        <div th:if="${session.loggedInUser != null and session.userRole == 'DONOR'}">
+                            <span class="d-block text-center text-muted small py-2 bg-light rounded-pill">
+                                <i class="bi bi-shield-lock me-1"></i> Reserved for NGO Claims
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(listings)}" class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-4">
+            <div class="py-4">
+                <div class="fs-1 mb-3">🍲</div>
+                <h4 class="fw-bold text-dark mb-2">No Active Food Listings Found</h4>
+                <p class="text-muted mx-auto" style="max-width: 480px;">
+                    There are no surplus food listings matching your criteria at the moment. Donors can post new donations anytime!
+                </p>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a th:if="${session.loggedInUser != null and session.userRole == 'DONOR'}" href="/donate" class="btn-primary-custom text-decoration-none">
+                        + Post Food Listing
+                    </a>
+                    <a href="/" class="btn btn-light rounded-pill px-4 py-2 fw-semibold text-muted">
+                        Clear Search Filters
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Single Global Claim Modal (Placed outside grid to prevent hover/transform flickering) -->
+<div class="modal fade" id="globalClaimModal" tabindex="-1" aria-labelledby="globalClaimModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark" id="globalClaimModalLabel">Confirm Food Claim</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-3 text-secondary">Are you sure your NGO is ready to pick up and distribute this food provision?</p>
+                <div class="bg-light p-3 rounded-3 mb-3 border">
+                    <div class="fw-bold text-dark fs-5" id="modalClaimTitle">Food Title</div>
+                    <div class="text-muted small mt-1">
+                        <i class="bi bi-box2 me-1 text-success"></i> <span id="modalClaimQuantity">Quantity</span> &nbsp;|&nbsp;
+                        <i class="bi bi-geo-alt me-1 text-danger"></i> <span id="modalClaimLocation">Location</span>
+                    </div>
+                </div>
+                <div class="small text-muted d-flex align-items-start gap-2">
+                    <i class="bi bi-info-circle-fill text-primary mt-1"></i>
+                    <span>Once claimed, the donor's direct contact phone number will be unlocked on your dashboard for immediate pickup coordination.</span>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <a id="modalClaimConfirmBtn" href="#" class="btn btn-success rounded-pill px-4 fw-semibold">
+                    Yes, Confirm Claim
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Reusable Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const claimModalEl = document.getElementById('globalClaimModal');
+        if (!claimModalEl) return;
+        const claimModal = new bootstrap.Modal(claimModalEl);
+
+        document.querySelectorAll('.claim-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const title = this.getAttribute('data-title');
+                const quantity = this.getAttribute('data-quantity');
+                const location = this.getAttribute('data-location');
+
+                document.getElementById('modalClaimTitle').textContent = title || 'Food Listing';
+                document.getElementById('modalClaimQuantity').textContent = quantity || '';
+                document.getElementById('modalClaimLocation').textContent = location || '';
+                document.getElementById('modalClaimConfirmBtn').setAttribute('href', '/claim/' + id);
+
+                claimModal.show();
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Smart Food Donation System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Design System Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+<!-- Include Reusable Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="flex-grow-1 d-flex align-items-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5 col-xl-4">
+
+                <div class="auth-card p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="brand-badge mb-3" style="width: 52px; height: 52px; font-size: 1.6rem;">🌱</div>
+                        <h3 class="fw-extrabold text-dark mb-1">Welcome Back</h3>
+                        <p class="text-muted small">Sign in to access your donation or pickup portal</p>
+                    </div>
+
+                    <!-- Flash / Error Alerts -->
+                    <div th:if="${successMessage}" class="custom-alert custom-alert-success small py-2" th:text="${successMessage}"></div>
+                    <div th:if="${error}" class="custom-alert custom-alert-danger small py-2" th:text="${error}"></div>
+                    <div th:if="${errorMessage}" class="custom-alert custom-alert-danger small py-2" th:text="${errorMessage}"></div>
+
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark small">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-envelope text-emerald"></i></span>
+                                <input type="email" name="email" class="form-control form-control-custom" required placeholder="name@example.com">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label fw-bold text-dark small mb-0">Password</label>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-lock text-emerald"></i></span>
+                                <input type="password" name="password" class="form-control form-control-custom" required placeholder="••••••••">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-semibold shadow-md py-2 fs-6">
+                            Sign In to Portal
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="text-muted small mb-2">
+                            Don't have an account?
+                            <a href="/register" class="text-success fw-bold text-decoration-none">Create an Account</a>
+                        </p>
+                        <a href="/" class="text-muted small text-decoration-none">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Public Directory
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include Reusable Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

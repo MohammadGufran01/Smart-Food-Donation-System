@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGO Receiver Dashboard - Smart Food Donation</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Design System Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+<!-- Include Reusable Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="flex-grow-1">
+    <div class="container py-4 py-lg-5">
+
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="custom-alert custom-alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="custom-alert custom-alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- NGO Header Profile Card -->
+        <div class="modern-card p-4 p-md-5 mb-4">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="d-inline-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-1 rounded-pill fw-bold">
+                            🏢 Certified NGO Partner
+                        </span>
+                    </div>
+                    <h2 class="fw-extrabold text-dark mb-1">
+                        Welcome, <span class="text-emerald" th:text="${user.name}">NGO Name</span>!
+                    </h2>
+                    <p class="text-muted small mb-3">Coordinate pickups and confirm successful food distributions with donor partners.</p>
+                    <div class="d-flex flex-wrap gap-4 text-secondary small">
+                        <div><i class="bi bi-envelope text-emerald me-1"></i> <span th:text="${user.email}">ngo@example.com</span></div>
+                        <div><i class="bi bi-telephone text-emerald me-1"></i> <span th:text="${user.phone}">+91 9876543210</span></div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <a href="/" class="btn-primary-custom text-decoration-none shadow-md">
+                        <i class="bi bi-compass-fill fs-5"></i>
+                        <span>Browse Available Food</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Stats Grid -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-semibold text-uppercase">Total Claims</div>
+                            <div class="fs-2 fw-bold text-dark mt-1" th:text="${stats.totalClaimed}">0</div>
+                        </div>
+                        <div class="stat-icon emerald">
+                            <i class="bi bi-basket3-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-semibold text-uppercase">Pending Pickup</div>
+                            <div class="fs-2 fw-bold text-primary mt-1" th:text="${stats.pendingPickup}">0</div>
+                        </div>
+                        <div class="stat-icon blue">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-semibold text-uppercase">Completed Rescues</div>
+                            <div class="fs-2 fw-bold text-success mt-1" th:text="${stats.completedCount}">0</div>
+                        </div>
+                        <div class="stat-icon emerald">
+                            <i class="bi bi-check2-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-semibold text-uppercase">Total Food Claimed</div>
+                            <div class="fs-2 fw-bold text-info mt-1" th:text="${stats.totalQuantityReceived}">0</div>
+                        </div>
+                        <div class="stat-icon purple">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claimed Provisions Schedule Table -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-5">
+            <div class="p-4 border-bottom bg-white d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="fw-bold text-dark mb-1">Claimed Food Provisions & Pickup Schedule</h4>
+                    <p class="text-muted small mb-0">Direct donor contact details unlocked for prompt collection.</p>
+                </div>
+                <a href="/" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-semibold">
+                    + Claim More Food
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                    <tr>
+                        <th>Food Details</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Pickup Address</th>
+                        <th>Donor Contact</th>
+                        <th>Expiry Window</th>
+                        <th>Status</th>
+                        <th class="text-end">Pickup Confirmation</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${claimedListings}">
+                        <td>
+                            <div class="fw-bold text-dark" th:text="${item.title}">Food Title</div>
+                            <div class="text-muted small" th:if="${item.description != null and !item.description.isEmpty()}" th:text="${item.description}">Instructions...</div>
+                        </td>
+                        <td>
+                            <span th:if="${item.foodType == 'Vegetarian'}" class="type-pill veg">🌱 Veg</span>
+                            <span th:if="${item.foodType == 'Non-Vegetarian'}" class="type-pill nonveg">🍗 Non-Veg</span>
+                            <span th:if="${item.foodType == 'Vegan'}" class="type-pill veg">🥗 Vegan</span>
+                            <span th:if="${item.foodType == 'Packaged / Dry Food'}" class="type-pill">📦 Dry/Pack</span>
+                            <span th:if="${item.foodType == null or (item.foodType != 'Vegetarian' and item.foodType != 'Non-Vegetarian' and item.foodType != 'Vegan' and item.foodType != 'Packaged / Dry Food')}" class="type-pill">🍲 General</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark fw-bold px-2 py-1" th:text="${item.quantity} + ' ' + ${item.unit != null ? item.unit : 'Meals'}">20 Meals</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="bi bi-geo-alt-fill text-danger small"></i>
+                                <span class="text-muted small" th:text="${item.location}">123 Main St</span>
+                            </div>
+                        </td>
+                        <td>
+                            <!-- Unlocked Donor Direct Details -->
+                            <div class="fw-bold text-dark small" th:text="${item.donor.name}">Donor Name</div>
+                            <a th:href="'tel:' + ${item.donor.phone}" class="text-decoration-none text-success small fw-bold">
+                                <i class="bi bi-telephone-fill me-1"></i>
+                                <span th:text="${item.donor.phone}">+91 9876543210</span>
+                            </a>
+                        </td>
+                        <td>
+                            <span class="small fw-semibold text-secondary" th:text="${#temporals.format(item.expiryTime, 'dd MMM, hh:mm a')}">Expiry</span>
+                        </td>
+                        <td>
+                            <span th:if="${item.status == 'CLAIMED'}" class="status-pill claimed">
+                                🟡 In Transit
+                            </span>
+                            <span th:if="${item.status == 'COMPLETED'}" class="status-pill completed">
+                                ✓ Received
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div th:if="${item.status == 'CLAIMED'}">
+                                <button type="button" class="btn btn-sm btn-success rounded-pill px-3 fw-semibold shadow-sm complete-btn"
+                                        th:data-id="${item.id}"
+                                        th:data-title="${item.title}"
+                                        th:data-donor="${item.donor.name} + ' (' + ${item.donor.phone} + ')'">
+                                    <i class="bi bi-check-circle me-1"></i> Mark Picked Up
+                                </button>
+                            </div>
+
+                            <span th:if="${item.status == 'COMPLETED'}" class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-semibold">
+                                <i class="bi bi-patch-check-fill me-1"></i> Distribution Done
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(claimedListings)}">
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <div class="py-4">
+                                <div class="fs-1 mb-2">🚚</div>
+                                <h5 class="fw-bold text-secondary">No food provisions claimed yet.</h5>
+                                <p class="small text-muted mb-3">Browse available surplus food listings in your area and claim them for redistribution.</p>
+                                <a href="/" class="btn btn-success rounded-pill px-4 fw-semibold shadow-sm">Browse Public Food Directory</a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Single Global Complete Modal (Placed outside table to prevent row hover jitter) -->
+<div class="modal fade" id="globalCompleteModal" tabindex="-1" aria-labelledby="globalCompleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-success" id="globalCompleteModalLabel">Confirm Food Collection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-3">
+                <p class="text-secondary">Have you successfully collected this food donation from the donor for distribution?</p>
+                <div class="bg-light p-3 rounded-3 border mb-2">
+                    <div class="fw-bold text-dark fs-5" id="modalCompleteTitle">Item Title</div>
+                    <div class="text-muted small mt-1" id="modalCompleteDonor">Donor info</div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Not Yet</button>
+                <a id="modalCompleteConfirmBtn" href="#" class="btn btn-success rounded-pill px-4 fw-semibold">
+                    Yes, Completed & Received
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Reusable Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const completeModalEl = document.getElementById('globalCompleteModal');
+        if (!completeModalEl) return;
+        const completeModal = new bootstrap.Modal(completeModalEl);
+
+        document.querySelectorAll('.complete-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const title = this.getAttribute('data-title');
+                const donor = this.getAttribute('data-donor');
+
+                document.getElementById('modalCompleteTitle').textContent = title || 'Food Item';
+                document.getElementById('modalCompleteDonor').textContent = 'Donor: ' + (donor || '');
+                document.getElementById('modalCompleteConfirmBtn').setAttribute('href', '/complete/' + id);
+
+                completeModal.show();
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Smart Food Donation System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Design System Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+<!-- Include Reusable Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="flex-grow-1 d-flex align-items-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 col-xl-5">
+
+                <div class="auth-card p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="brand-badge mb-3" style="width: 52px; height: 52px; font-size: 1.6rem;">🌱</div>
+                        <h3 class="fw-extrabold text-dark mb-1">Create an Account</h3>
+                        <p class="text-muted small">Join our zero-waste smart food distribution network</p>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <div th:if="${error}" class="custom-alert custom-alert-danger small py-2" th:text="${error}"></div>
+                    <div th:if="${errorMessage}" class="custom-alert custom-alert-danger small py-2" th:text="${errorMessage}"></div>
+
+                    <form th:action="@{/register}" th:object="${user}" method="post">
+                        <!-- Role Choice -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark small mb-2">Select Your Role</label>
+                            <div class="role-selector">
+                                <label class="role-option" id="donorOption">
+                                    <input type="radio" th:field="*{role}" value="DONOR" class="d-none" checked onchange="updateRoleUi()">
+                                    <div class="fs-4 mb-1">🍽️</div>
+                                    <div class="fw-bold fs-6">Food Donor</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Restaurants / Events</div>
+                                </label>
+                                <label class="role-option" id="ngoOption">
+                                    <input type="radio" th:field="*{role}" value="NGO" class="d-none" onchange="updateRoleUi()">
+                                    <div class="fs-4 mb-1">🏢</div>
+                                    <div class="fw-bold fs-6">NGO Partner</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Charities / Shelters</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark small">Full Name / Organization Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-person text-emerald"></i></span>
+                                <input type="text" th:field="*{name}" class="form-control form-control-custom" required placeholder="e.g., John Doe or Hope Foundation">
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark small">Email Address <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-envelope text-emerald"></i></span>
+                                <input type="email" th:field="*{email}" class="form-control form-control-custom" required placeholder="name@example.com">
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark small">Contact Phone Number <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-telephone text-emerald"></i></span>
+                                <input type="tel" th:field="*{phone}" class="form-control form-control-custom" required placeholder="+91 9876543210">
+                            </div>
+                            <div class="form-text small text-muted">Used for direct pickup coordination between Donors and NGOs.</div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark small">Password <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-lock text-emerald"></i></span>
+                                <input type="password" th:field="*{password}" class="form-control form-control-custom" required placeholder="••••••••">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-semibold shadow-md py-2 fs-6">
+                            Register & Get Started
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="text-muted small mb-2">
+                            Already have an account?
+                            <a href="/login" class="text-success fw-bold text-decoration-none">Sign in here</a>
+                        </p>
+                        <a href="/" class="text-muted small text-decoration-none">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Public Directory
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include Reusable Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function updateRoleUi() {
+        const donorRadio = document.querySelector('input[value="DONOR"]');
+        const ngoRadio = document.querySelector('input[value="NGO"]');
+        const donorOpt = document.getElementById('donorOption');
+        const ngoOpt = document.getElementById('ngoOption');
+
+        if (donorRadio && donorRadio.checked) {
+            donorOpt.classList.add('active');
+            ngoOpt.classList.remove('active');
+        } else if (ngoOpt) {
+            ngoOpt.classList.add('active');
+            donorOpt.classList.remove('active');
+        }
+    }
+    // Initialize UI on page load
+    document.addEventListener('DOMContentLoaded', updateRoleUi);
+</script>
+</body>
+</html>

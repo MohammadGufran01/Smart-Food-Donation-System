@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Food Donation - Smart Food Donation System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Design System Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+<!-- Include Reusable Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="flex-grow-1 py-4 py-lg-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Breadcrumb / Back button -->
+                <div class="mb-3">
+                    <a href="/donor/dashboard" class="text-decoration-none text-muted small fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Donor Dashboard
+                    </a>
+                </div>
+
+                <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <div class="brand-badge" style="width: 48px; height: 48px; font-size: 1.5rem;">🍲</div>
+                        <div>
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-bold mb-1">Donor Listing Form</span>
+                            <h3 class="fw-extrabold text-dark mb-0">Post Surplus Food Donation</h3>
+                        </div>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <div th:if="${errorMessage}" class="custom-alert custom-alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                        <span th:text="${errorMessage}"></span>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <form th:action="@{/donate}" th:object="${listing}" method="post">
+                        <!-- Food Title -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark small">
+                                Food Listing Title <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-tag text-emerald"></i></span>
+                                <input type="text" th:field="*{title}" class="form-control form-control-custom" required placeholder="e.g. 50 Packets of Fresh Vegetable Biryani & Curry">
+                            </div>
+                        </div>
+
+                        <!-- Category & Unit -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark small">
+                                    Food Category <span class="text-danger">*</span>
+                                </label>
+                                <select th:field="*{foodType}" class="form-select form-select-custom" required>
+                                    <option value="Vegetarian">🌱 Vegetarian</option>
+                                    <option value="Non-Vegetarian">🍗 Non-Vegetarian</option>
+                                    <option value="Vegan">🥗 Vegan</option>
+                                    <option value="Packaged / Dry Food">📦 Packaged / Dry Food</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="row g-2">
+                                    <div class="col-7">
+                                        <label class="form-label fw-bold text-dark small">
+                                            Quantity <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="number" th:field="*{quantity}" min="1" class="form-control form-control-custom" required placeholder="e.g. 25">
+                                    </div>
+                                    <div class="col-5">
+                                        <label class="form-label fw-bold text-dark small">Unit</label>
+                                        <select th:field="*{unit}" class="form-select form-select-custom">
+                                            <option value="Meals">Meals</option>
+                                            <option value="Kg">Kg</option>
+                                            <option value="Boxes">Boxes</option>
+                                            <option value="Packets">Packets</option>
+                                            <option value="Portions">Portions</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expiry Time & Contact Phone -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark small">
+                                    Expiry / Best Before Date & Time <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0"><i class="bi bi-clock-history text-warning"></i></span>
+                                    <input type="datetime-local" th:field="*{expiryTime}" class="form-control form-control-custom" required>
+                                </div>
+                                <div class="form-text small text-muted">Please specify when the food should be collected by.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark small">
+                                    Contact Phone Number for Pickup <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0"><i class="bi bi-telephone text-emerald"></i></span>
+                                    <input type="tel" th:field="*{contactPhone}" class="form-control form-control-custom" required placeholder="+91 9876543210">
+                                </div>
+                                <div class="form-text small text-muted">Visible only to verified NGOs that claim this listing.</div>
+                            </div>
+                        </div>
+
+                        <!-- Pickup Location -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark small">
+                                Exact Pickup Address & Location <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-geo-alt text-danger"></i></span>
+                                <input type="text" th:field="*{location}" class="form-control form-control-custom" required placeholder="e.g. Royal Palace Banquet Hall, Gate #2, MG Road, Metro Pillar 45">
+                            </div>
+                        </div>
+
+                        <!-- Description & Handling Notes -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark small">
+                                Food Preparation & Handling Notes (Optional)
+                            </label>
+                            <textarea th:field="*{description}" rows="3" class="form-control form-control-custom" placeholder="e.g., Prepared at 1:00 PM today. Kept in warm insulated containers. Contains dairy and nuts."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 pt-2">
+                            <button type="submit" class="btn btn-success btn-lg rounded-pill fw-semibold shadow-md py-3">
+                                <i class="bi bi-check2-circle me-1"></i> Publish Food Donation Listing
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include Reusable Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

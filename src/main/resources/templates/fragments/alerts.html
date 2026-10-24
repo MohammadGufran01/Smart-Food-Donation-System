@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="alerts">
+    <!-- Success Flash Message -->
+    <div th:if="${successMessage != null}" class="custom-alert custom-alert-success shadow-sm" role="alert">
+        <span class="fs-5">✨</span>
+        <div class="flex-grow-1" th:text="${successMessage}"></div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Error Flash Message -->
+    <div th:if="${errorMessage != null}" class="custom-alert custom-alert-danger shadow-sm" role="alert">
+        <span class="fs-5">⚠️</span>
+        <div class="flex-grow-1" th:text="${errorMessage}"></div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Direct Error Attribute (e.g. from form validation) -->
+    <div th:if="${error != null}" class="custom-alert custom-alert-danger shadow-sm" role="alert">
+        <span class="fs-5">⚠️</span>
+        <div class="flex-grow-1" th:text="${error}"></div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+</body>
+</html>
